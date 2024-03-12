@@ -1,6 +1,5 @@
 import express from 'express'
 import fetch from 'node-fetch'
-import {PHONENUMBER_MCC} from '@adiwajshing/baileys'
 import axios from 'axios'
 import { exec } from 'child_process';
 // import path from 'path';
