@@ -1,102 +1,72 @@
 import express from 'express'
 import fetch from 'node-fetch'
+import {PHONENUMBER_MCC} from '@adiwajshing/baileys'
 import axios from 'axios'
 import { exec } from 'child_process';
 // import path from 'path';
 
-let app = global.app = express()
+let app = global.app = express();
 
 function connect(PORT) {
 
-    app.get('/', (req, res) => res.send(`<!DOCTYPE html>
-    <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta http-equiv="refresh" content="10">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link rel="icon" href="https://avatars.githubusercontent.com/u/76462435?s=400&u=a8207729fb6ec02ecb92f3477e6d13b022b3f52a&v=4" type="image/x-icon">
-        <link rel="shortcut icon" href="https://avatars.githubusercontent.com/u/76462435?s=400&u=a8207729fb6ec02ecb92f3477e6d13b022b3f52a&v=4" type="image/x-icon">
-        <title>Nao-MD Bot</title>
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-        <style>
-            body {
-                font-family: 'Arial', sans-serif;
-                background-color: #1a1a1a;
-                color: #ffffff;
-                display: flex;
-                flex-direction: column;
-                justify-content: center;
-                align-items: center;
-                height: 100vh;
-                margin: 0;
-            }
+    const codePath = path.join(__dirname, 'views', 'generateCode');
     
-            #clock-container {
-                font-size: 24px;
-                text-align: center;
-                margin-bottom: 20px;
-            }
-    
-            #clock {
-                color: #ff9900; /* Ubah warna jam menjadi oranye */
-                font-weight: bold;
-            }
-    
-            #name {
-                font-size: 24px;
-                color: #ff9900;
-            }
-    
-            .btn-custom {
-                background-color: green;
-                color: #fff;
-                border: none;
-            }
-        </style>
-    </head>
-    <body>
-    <div id="clock-container">
-    <div id="name">Shirokami Ryzen</div>
-    <div id="clock-wib"></div>
-    <div id="clock-wita"></div>
-    <div id="clock-wit"></div>
-    <br />
-    <div id="name">Server Status</div>
-    <div>Bot: Online</div>
+app.get('/', (req, res) => res.send(`
+    <!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="https://am1uth.netlify.app/threads.css">
+<style>
+  header,p,.input-box,.button {
+    font-family: 'Ariel', sans-serif; 
+    letter-spacing: 2px;
+  }
+  .input-box { color: #999; }
+  .input-box::placeholder {
+    font-size: 12px; 
+    text-align: center;
+    }
+   p { 
+   color: rgba(255,255,255,0.6);
+    font-size: 10px;
+  } 
+</style>
+
+  <title>WhatsApp bot</title>
+</head>
+<body>
+  <div class="container">
+    <header>
+    	<p>Devoloped by amruth<p>
+      <h1>Devil Eye MD</h1>
+    </header>
+    <div class="posts">
+    	<p>Devil Eye is a simple WhatsApp bot to send messages via API endpoints. You can validate numbers on this API. This bot is under beta stage so you can face many bugs and errors, kindly please contact and give feedbacks to solve the issues.</p>
+    	<input type="number" placeholder="Enter phone number here.. " class="input-box"
+    	<br><br>
+    	<button class="button">Get Code</button>
     </div>
-        
-        <div class="container text-center">
-            <a href="https://wa.me/6285864034767" class="btn btn-custom btn-primary" target="_blank">Use Bot</a>
-        </div>
-    <br>
-        <div class="container text-center">
-            <a href="https://ryzendesu.com/" class="btn btn-custom btn-primary" target="_blank">Visit My Website</a>
-        </div>
-    
-        <script>
-            function updateClock() {
-                const now = new Date();
-                const options = { hour12: false };
-                const timeStringWIB = now.toLocaleTimeString('en-US', { timeZone: 'Asia/Jakarta' });
-                const timeStringWITA = now.toLocaleTimeString('en-US', { timeZone: 'Asia/Makassar' });
-                const timeStringWIT = now.toLocaleTimeString('en-US', { timeZone: 'Asia/Jayapura' });
-    
-                document.getElementById('clock-wib').textContent = timeStringWIB + " (WIB)";
-                document.getElementById('clock-wita').textContent = timeStringWITA + " (WITA)";
-                document.getElementById('clock-wit').textContent = timeStringWIT + " (WIT)";
-            }
-    
-            setInterval(updateClock, 1000);
-    
-            updateClock();
-        </script>
-    
-        <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
-        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-    </body>
-    </html>
-`))
+    </div>
+    <footer>
+      <p>&copy; 2023 <a href="https://am1uth.
+netlify.app/">Amruth</a></p>
+    </footer>
+    <script>
+    	let btn = document.getElementsByClassName("button")[0];
+    	let input = document.getElementsByClassName("input-box")[0];
+    let data = document.getElementsByClassName("posts")[0];
+    btn.addEventListener('click',() => {
+    if(input.value.length !== 10 || input.value.match(/1-9/)) alert("Invalid number");
+    fetch(${codePath})
+    .then(res => {
+       data.innerHTML = "<h2>"+res.data+"</h2>";
+      });
+    });
+</script>
+</body>
+</html>`));
 
     //   app.get('/', (req, res) => {
     //     const indexPath = path.join(__dirname, 'views', 'index.html');
@@ -155,6 +125,10 @@ function connect(PORT) {
         res.status(200).send(pingResults.join('\n\n\n'));
     });
 
+app.listen(port, () => {
+  console.log(`Server listening on port ${port}`);
+});
+    
 
     app.listen(PORT, () => {
         keepAlive();
