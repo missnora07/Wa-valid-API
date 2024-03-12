@@ -188,27 +188,37 @@ app.get('/generateCode', async (req, res) => {
   try {
     const { registration } = { registration: {} };
     let phoneNumber = req.query.phoneNumber;
-      if(phoneNumber) {
-    if(!Object.keys(PHONENUMBER_MCC).some(v => phoneNumber.startsWith(v))
-    phoneNumber = phoneNumber.replace(/\D/g, '');
-    setTimeout(async () => {
-    let code = await conn.requestPairingCode(phoneNumber);
-    code = code?.match(/.{1,4}/g)?.join('-') || code;
-    res.status(200).json({ code });
-    }, 3000);
+    if (phoneNumber) {
+      if (!Object.keys(PHONENUMBER_MCC).some(v => phoneNumber.startsWith(v))) {
+        phoneNumber = phoneNumber.replace(/\D/g, '');
+        setTimeout(async () => {
+          try {
+            let code = await conn.requestPairingCode(phoneNumber);
+            code = code?.match(/.{1,4}/g)?.join('-') || code;
+            res.status(200).json({ code });
+          } catch (error) {
+            console.error('Error generating code:', error);
+            res.status(500).send('Internal Server Error');
+          }
+        }, 3000);
+      } else {
+        res.status(400).send('Invalid phone number format');
+      }
+    } else {
+      res.status(400).send('Missing phoneNumber parameter');
+    }
   } catch (error) {
-    console.error('Error generating code:', error);
+    console.error('Error:', error);
     res.status(500).send('Internal Server Error');
   }
-    } else {
-        res.status(400).send('Missing params');
 });
 
-const port = 3000 || 5000;
+const port = process.env.PORT || 3000;
 
 app.listen(port, () => {
   console.log(`Server listening on port ${port}`);
 });
+      
 
 
 if (!opts['test']) {
