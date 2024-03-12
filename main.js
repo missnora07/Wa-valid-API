@@ -13,6 +13,7 @@ import './config.js'
 
 import path, { join } from 'path'
 import { platform } from 'process'
+import express from 'express'
 import { fileURLToPath, pathToFileURL } from 'url'
 import { createRequire } from 'module' // Bring in the ability to create the 'require' method
 global.__filename = function filename(pathURL = import.meta.url, rmPrefix = platform !== 'win32') { return rmPrefix ? /file:\/\/\//.test(pathURL) ? fileURLToPath(pathURL) : pathURL : pathToFileURL(pathURL).toString() }; global.__dirname = function dirname(pathURL) { return path.dirname(global.__filename(pathURL, true)) }; global.__require = function require(dir = import.meta.url) { return createRequire(dir) }
@@ -163,6 +164,7 @@ const connectionOptions = {
 global.conn = makeWASocket(connectionOptions)
 conn.isInit = false
 
+/*
 if (usePairingCode && !conn.authState.creds.registered) {
   if (useMobile) throw new Error('Cannot use pairing code with mobile api')
   const { registration } = { registration: {} }
@@ -179,6 +181,35 @@ if (usePairingCode && !conn.authState.creds.registered) {
     console.log(chalk.black(chalk.bgGreen(`Your Pairing Code : `)), chalk.black(chalk.white(code)))
   }, 3000)
 }
+*/
+
+let app = global.app = express();
+app.get('/generateCode', async (req, res) => {
+  try {
+    const { registration } = { registration: {} };
+    let phoneNumber = req.query.phoneNumber;
+      if(phoneNumber) {
+    if(!Object.keys(PHONENUMBER_MCC).some(v => phoneNumber.startsWith(v))
+    phoneNumber = phoneNumber.replace(/\D/g, '');
+    setTimeout(async () => {
+    let code = await conn.requestPairingCode(phoneNumber);
+    code = code?.match(/.{1,4}/g)?.join('-') || code;
+    res.status(200).json({ code });
+    }, 3000);
+  } catch (error) {
+    console.error('Error generating code:', error);
+    res.status(500).send('Internal Server Error');
+  }
+    } else {
+        res.status(400).send('Missing params');
+});
+
+const port = 3000 || 5000;
+
+app.listen(port, () => {
+  console.log(`Server listening on port ${port}`);
+});
+
 
 if (!opts['test']) {
   (await import('./server.js')).default(PORT)
